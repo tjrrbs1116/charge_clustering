@@ -68,7 +68,7 @@ class clustering : public rclcpp::Node{
     float target_rad = 0.0;
     bool target_rad_flag = false;
     float dth =0.05;
-  
+    
     bool find_object = false;
     bool keep_charge_location = false;
 

@@ -29,7 +29,7 @@ clustering::clustering(const rclcpp::NodeOptions & options)
     // std::bind(&clustering::OdomsubReceived, this, std::placeholders::_1));
     timer_ = this->create_wall_timer(10ms,std::bind(&clustering::timerCallback,this));
 
-    first_aline_degree_threshold = 0.01; // rad
+    first_aline_degree_threshold = 0.005; // rad
     docking_y_axis_x_offset = 0.55;
     docking_y_axis_tolerance =0.03;
     charge_object_distance = 1.0;
@@ -54,11 +54,11 @@ void clustering::timerCallback(){
 
     case 0 :
     {
-        // RCLCPP_INFO (get_logger(),"first aline process");
+        RCLCPP_INFO (get_logger(),"first aline process");
 
           Eigen::VectorXf v (2);
           Eigen::VectorXf v1 (2);
-          v(0)=  charge_object_f.first- charge_object_l.first ; v(1) = charge_object_l.first -charge_object_l.second;
+          v(0)=  charge_object_f.first- charge_object_l.first ; v(1) = charge_object_f.second -charge_object_l.second;
           v1(0) = 1. ; v1(1) =0.;
           float dot = v.dot(v1);
           float v_norm = v.norm();
@@ -66,7 +66,7 @@ void clustering::timerCallback(){
 
           float dist_rad = acos(dot/(v_norm * v1_norm));
       #ifdef debug
-        RCLCPP_INFO (get_logger(),"deg distance is %4f", abs(dist_rad - PI/2) *rad2deg);
+        RCLCPP_INFO (get_logger(),"deg distance is %4f", dist_rad *rad2deg);
         RCLCPP_INFO (get_logger(),"deg is %4f", dist_rad *rad2deg);
       #endif
 
@@ -298,7 +298,6 @@ void clustering::callback(const sensor_msgs::msg::LaserScan::ConstPtr& scan_in){
               last_index =  3*last_index/4;
               charge_object_f = {point_clusters[g][first_index].first,point_clusters[g][first_index].second};
               charge_object_l = {point_clusters[g][last_index].first,point_clusters[g][last_index].second};
-
               }
                           visualization_msgs::msg::Marker marker2;
                           marker2.header.frame_id = "base_link";
